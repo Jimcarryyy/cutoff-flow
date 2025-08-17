@@ -2,27 +2,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Target, Wallet, TrendingUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-
-// Mock data for demonstration
-const currentCutoff = {
-  salary: 35000,
-  allocations: {
-    dailyNeeds: { planned: 14000, actual: 12500, percentage: 40 },
-    school: { planned: 7000, actual: 7000, percentage: 20 },
-    parents: { planned: 3500, actual: 3500, percentage: 10 },
-    girlfriend: { planned: 3500, actual: 2800, percentage: 10 },
-    savings: { planned: 3500, actual: 3500, percentage: 10 },
-    goals: { planned: 2100, actual: 2100, percentage: 6 },
-    personal: { planned: 1400, actual: 800, percentage: 4 }
-  }
-};
-
-const goals = [
-  { id: 1, name: "Renovation + Aircon", target: 70000, current: 15400, priority: 1 },
-  { id: 2, name: "High-End PC", target: 45000, current: 8200, priority: 2 }
-];
+import { ExpenseModal } from "@/components/ExpenseModal";
+import { GoalModal } from "@/components/GoalModal";
+import { NewCutoffModal } from "@/components/NewCutoffModal";
+import { useFinanceData } from "@/hooks/useFinanceData";
 
 export function Dashboard() {
+  const {
+    currentCutoff,
+    goals,
+    expenses,
+    addExpense,
+    updateGoal,
+    startNewCutoff
+  } = useFinanceData();
   const totalActual = Object.values(currentCutoff.allocations).reduce((sum, cat) => sum + cat.actual, 0);
   const totalPlanned = Object.values(currentCutoff.allocations).reduce((sum, cat) => sum + cat.planned, 0);
   const remainingBalance = currentCutoff.salary - totalActual;
@@ -37,10 +30,15 @@ export function Dashboard() {
               <h1 className="text-3xl font-semibold text-foreground">Finance Dashboard</h1>
               <p className="text-muted-foreground mt-1">Cutoff Period: January 1-15, 2024</p>
             </div>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Entry
-            </Button>
+            <ExpenseModal 
+              onAddExpense={addExpense}
+              trigger={
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  New Entry
+                </Button>
+              }
+            />
           </div>
         </div>
 
@@ -196,18 +194,22 @@ export function Dashboard() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Expense
-                </Button>
-                <Button variant="outline" className="w-full justify-start gap-2">
-                  <Target className="h-4 w-4" />
-                  Update Goal
-                </Button>
-                <Button variant="outline" className="w-full justify-start gap-2">
-                  <Wallet className="h-4 w-4" />
-                  New Cutoff
-                </Button>
+                <ExpenseModal 
+                  onAddExpense={addExpense}
+                  trigger={
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add Expense
+                    </Button>
+                  }
+                />
+                <GoalModal 
+                  goals={goals}
+                  onUpdateGoal={updateGoal}
+                />
+                <NewCutoffModal 
+                  onStartNewCutoff={startNewCutoff}
+                />
               </CardContent>
             </Card>
           </div>
